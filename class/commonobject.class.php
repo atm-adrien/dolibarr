@@ -6568,6 +6568,16 @@ abstract class CommonObject
 								var parent = $(this).find("option[parent]:first").attr("parent");
 								var infos = parent.split(":");
 								var parent_list = infos[0];
+								if ($("#"+child_list).val() == 0){
+								    $("#"+child_list).hide();
+								}
+								$("select[name=\""+parent_list+"\"]").click(function() {
+								    if ($(this).val() == 0){
+								   		$("#"+child_list).hide();
+									} else {
+								        $("#"+child_list).show()
+									}
+								});
 								$("select[name=\""+parent_list+"\"]").change(function() {
 									showOptions(child_list, parent_list);
 									$("#"+child_list).val(0).trigger("change");
