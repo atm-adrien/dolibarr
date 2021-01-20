@@ -6550,7 +6550,7 @@ abstract class CommonObject
 			if (! empty($conf->use_javascript_ajax)) {
 				$out .= '
 				<script>
-				    jQuery(document).ready(function() {
+				    				    jQuery(document).ready(function() {
 				    	function showOptions(child_list, parent_list)
 				    	{
 				    		var val = $("select[name=\""+parent_list+"\"]").val();
@@ -6568,11 +6568,27 @@ abstract class CommonObject
 								var parent = $(this).find("option[parent]:first").attr("parent");
 								var infos = parent.split(":");
 								var parent_list = infos[0];
-								showOptions(child_list, parent_list);
-
-								/* Activate the handler to call showOptions on each future change */
+								//Hide daughters lists
+								if ($("#"+child_list).val() == 0 && $("#"+parent_list).val() == 0){
+								    $("#"+child_list).hide();
+								//Show mother lists
+								} else if ($("#"+parent_list).val() != 0){
+								    $("#"+parent_list).show();
+								}
+								//show the child list if the parent list value is selected
+								$("select[name=\""+parent_list+"\"]").click(function() {
+								    if ($(this).val() != 0){
+								        $("#"+child_list).show()
+									}
+								});
 								$("select[name=\""+parent_list+"\"]").change(function() {
 									showOptions(child_list, parent_list);
+									//Select the value 0 on child list on change on the parent list
+									$("#"+child_list).val(0).trigger("change");
+									//Hide child lists if the parent value is set to 0
+									if ($(this).val() == 0){
+								   		$("#"+child_list).hide();
+									}
 								});
 					    	});
 						}
