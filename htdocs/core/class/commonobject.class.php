@@ -6555,7 +6555,7 @@ abstract class CommonObject
 				    	{
 				    		var val = $("select[name=\""+parent_list+"\"]").val();
 				    		var parentVal = parent_list + ":" + val;
-				    		console.log(typeof val)
+				    		console.log(parentVal)
 				    		if(typeof val == "string"){
 				    		    if(val != "") {
 					    			$("select[name=\""+child_list+"\"] option[parent]").hide();
@@ -6587,6 +6587,8 @@ abstract class CommonObject
 								$("select[name=\""+parent_list+"\"]").click(function() {
 								    if ($(this).val() != 0){
 								        $("#"+child_list).show()
+									   	$(".multi-select-button").multiSelect("refresh");
+
 									}
 								});
 								$("select[name=\""+parent_list+"\"]").change(function() {

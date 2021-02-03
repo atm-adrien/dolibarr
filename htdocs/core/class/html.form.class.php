@@ -6322,7 +6322,7 @@ class Form
 		}
 
 		// Try also magic suggest
-		$out .= '<select id="'.$htmlname.'" class="multiselect'.($morecss?' '.$morecss:'').'" multiple name="'.$htmlname.'[]"'.($moreattrib?' '.$moreattrib:'').($width?' style="width: '.(preg_match('/%/', $width)?$width:$width.'px').'"':'').'>'."\n";
+		$out .= '<select id="'.$htmlname.'" class="multiselect'.($morecss?' '.$morecss:'').'" multiple name="'.$htmlname.'"'.($moreattrib?' '.$moreattrib:'').($width?' style="width: '.(preg_match('/%/', $width)?$width:$width.'px').'"':'').'>'."\n";
 		if (is_array($array) && ! empty($array))
 		{
 			if ($value_as_key) $array=array_combine($array, $array);
@@ -6331,14 +6331,20 @@ class Form
 			{
 				foreach ($array as $key => $value)
 				{
-					$out.= '<option value="'.$key.'"';
+					if (sizeof(explode("|", $value)) == 2){
+						$info = explode("|", $value);
+						$out.= '<option value="'.$key.'" parent="'.$info[1].'"';
+					} else {
+						$info = explode("|", $value);
+						$out .= '<option value="' . $key . '"';
+					}
                     if (is_array($selected) && ! empty($selected) && in_array((string) $key, $selected) && ((string) $key != ''))
 					{
 						$out.= ' selected';
 					}
 					$out.= '>';
 
-					$newval = ($translate ? $langs->trans($value) : $value);
+					$newval = ($translate ? $langs->trans($info[0]) : $info[0]);
 					$newval = ($key_in_label ? $key.' - '.$newval : $newval);
 					$out.= dol_htmlentitiesbr($newval);
 					$out.= '</option>'."\n";
