@@ -6569,6 +6569,36 @@ abstract class CommonObject
 								$("select[name=\""+child_list+"\"] option").show();
 							}
 				    	}
+				    	function showOptionsOnMultiselect(child_list, parent_list){
+				    	    var val = $("select[name=\""+parent_list+"\"]").val();
+				    		var parentVal = parent_list + ":" + val;
+				    		if(typeof val == "string"){
+				    		    if(val != "") {
+				    		        if($("#"+child_list).hasClass("multiselect")){
+				    		            //<span> class=select2-selection select2-selection--multiple
+								     	$("#"+child_list).next().children().children().click(function() {
+								         	var select = $("select[name=\""+child_list+"\"] option[parent=\""+parentVal+"\"]");
+								         	var select_values = [];
+								         	var ul_multiselect = $("#select2-"+child_list+"-results");
+								         	var li_multiselect = ul_multiselect.children();
+								         	var i = 0;
+								         	for (i; i<select.length; i++){
+								         	    select_values.push($(select[i]).val())
+								         	}
+								         	var cpt = 0;
+								         	for (var li of li_multiselect){
+								             	let info_id = li.id.split("-")
+								             	if (!select_values.includes(info_id[4])){
+								                 	if (select_values.length != 0){
+								                     	$(li).remove()
+								             		}
+								    			}
+								    		}
+										})
+					    			}
+		    		    		}
+				    		}
+				    	}
 						function setListDependencies() {
 					    	jQuery("select option[parent]").parent().each(function() {
 					    		var child_list = $(this).attr("name");
