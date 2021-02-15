@@ -6597,6 +6597,7 @@ abstract class CommonObject
 				    		    if($("#"+child_list).hasClass("multiselect")){
 								     	var allOptionsWithParent = $("select[id=\""+child_list+"\"] option")
 								        var optionsToShow = $("select[id=\""+child_list+"\"] option[parent=\""+parentVal+"\"]");
+								     	$("#"+child_list).select2();
 								        for (option of allOptionsWithParent){
 								            option.disabled = true;
 								        }
