@@ -6578,14 +6578,17 @@ abstract class CommonObject
 				    		        if($("#"+child_list).hasClass("multiselect")){
 								     	var allOptionsWithParent = $("select[id=\""+child_list+"\"] option")
 								        var optionsToShow = $("select[id=\""+child_list+"\"] option[parent=\""+parentVal+"\"]");
+								        $("#"+child_list).select2();
 								        for (option of allOptionsWithParent){
 								            option.disabled = true;
+//								            $("#"+child_list).trigger("change");
 								        }
 								        for (option of optionsToShow){
 								            option.disabled = false;
+//								            $("#"+child_list).trigger("change");
 								        }
 								        $("span.select2-selection.select2-selection--multiple").click(function() {
-								            var select2_liToHide = $(".select2-results__option[aria-disabled=true]")
+								        	var select2_liToHide = $(".select2-results__option[aria-disabled=true]")
 								        	for (li of select2_liToHide){
 								        	    $(li).css("display", "none")
 								        	}
