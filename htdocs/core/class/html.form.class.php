@@ -6342,7 +6342,6 @@ class Form
 						$out.= ' selected';
 					}
 					$out.= '>';
-//					print($out);
 					$newval = ($translate ? $langs->trans($info[0]) : $info[0]);
 					$newval = ($key_in_label ? $key.' - '.$newval : $newval);
 					$out.= dol_htmlentitiesbr($newval);
