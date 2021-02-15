@@ -6581,11 +6581,9 @@ abstract class CommonObject
 								        $("#"+child_list).select2();
 								        for (option of allOptionsWithParent){
 								            option.disabled = true;
-//								            $("#"+child_list).trigger("change");
 								        }
 								        for (option of optionsToShow){
 								            option.disabled = false;
-//								            $("#"+child_list).trigger("change");
 								        }
 								        $("span.select2-selection.select2-selection--multiple").click(function() {
 								        	var select2_liToHide = $(".select2-results__option[aria-disabled=true]")
