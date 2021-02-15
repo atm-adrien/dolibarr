@@ -6331,7 +6331,12 @@ class Form
 			{
 				foreach ($array as $key => $value)
 				{
-					$out.= '<option value="'.$key.'"';
+					if (sizeof(explode("|", $value)) == 2){
+						$info = explode("|", $value);
+						$out.= '<option value="'.$key.'" parent="'.$info[1].'"';
+					} else {
+						$out .= '<option value="' . $key . '"';
+					}
                     if (is_array($selected) && ! empty($selected) && in_array((string) $key, $selected) && ((string) $key != ''))
 					{
 						$out.= ' selected';
