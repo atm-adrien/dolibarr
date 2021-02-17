@@ -1154,7 +1154,7 @@ class ExtraFields
 				list($val, $parent) = explode('|', $val);
 				$out.='<option value="'.$key.'"';
 				$out.= (((string) $value == (string) $key)?' selected':'');
-				$out.= (!empty($parent)?' parent="'.$parent.'"':'');
+				$out.= (!empty($parent)?' data-parent="'.$parent.'"':'');
 				$out.='>';
 				if ($langfile && $val) $out.=$langs->trans($val);
 				else $out.=$val;
@@ -1310,7 +1310,7 @@ class ExtraFields
 
                                 $out .= '<option value="' . $obj->rowid . '"';
                                 $out .= ($value == $obj->rowid ? ' selected' : '');
-                                $out .= (!empty($parent) ? ' parent="' . $parent . '"' : '');
+                                $out .= (!empty($parent) ? ' data-parent="' . $parent . '"' : '');
                                 $out .= '>' . $labeltoshow . '</option>';
                             }
 

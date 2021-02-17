@@ -5599,7 +5599,7 @@ abstract class CommonObject
 				list($val, $parent) = explode('|', $val);
 				$out.='<option value="'.$key.'"';
 				$out.= (((string) $value == (string) $key)?' selected':'');
-				$out.= (!empty($parent)?' parent="'.$parent.'"':'');
+				$out.= (!empty($parent)?' data-parent="'.$parent.'"':'');
 				$out.='>'.$val.'</option>';
 			}
 			$out.='</select>';
@@ -5758,7 +5758,7 @@ abstract class CommonObject
 
 							$out.='<option value="'.$obj->rowid.'"';
 							$out.= ($value==$obj->rowid?' selected':'');
-							$out.= (!empty($parent)?' parent="'.$parent.'"':'');
+							$out.= (!empty($parent)?' data-parent="'.$parent.'"':'');
 							$out.='>'.$labeltoshow.'</option>';
 						}
 
@@ -6548,122 +6548,129 @@ abstract class CommonObject
 			$out .= "\n";
 			// Add code to manage list depending on others
 			if (! empty($conf->use_javascript_ajax)) {
+				// TODO: move this to an external js file
 				$out .= '
-				<script>
-				    jQuery(document).ready(function() {
-				    	function showOptions(child_list, parent_list)
-				    	{
-				    		var val = $("select[name=\""+parent_list+"\"]").val();
-				    		var parentVal = parent_list + ":" + val;
-				    		if(typeof val == "string"){
-				    		    if(val != "") {
-					    			$("select[name=\""+child_list+"\"] option[parent]").hide();
-					    			$("select[name=\""+child_list+"\"] option[parent=\""+parentVal+"\"]").show();
-								} else {
-									$("select[name=\""+child_list+"\"] option").show();
-								}
-				    		} else if(val > 0) {
-					    		$("select[name=\""+child_list+"\"] option[parent]").hide();
-					    		$("select[name=\""+child_list+"\"] option[parent=\""+parentVal+"\"]").show();
+				<script type="application/javascript">
+					jQuery(document).ready(function() {
+						/**
+						* Make select options visible or invisible depending on what option is selected in the parent
+						* select.
+						*
+						* @param {string} child_list  Code of the child extrafield (starts with "options_")
+						* @param {string} parent_list Code of the parent extrafield (starts with "options_")
+						*/
+						function showOptions(child_list, parent_list) {
+							let $child = $("select#" + child_list);
+							let $parent = $("select#" + parent_list);
+							var val = $parent.val();
+							var parentVal = parent_list + ":" + val;
+							let $childOptionsWithAParent = $child.find("option[data-parent]");
+							let $childOptionsWithSelectedParent = $child.find("option[data-parent=\"" + parentVal + "\"]");
+							if(val !== "") {
+								$childOptionsWithAParent.hide();
+								$childOptionsWithSelectedParent.show();
 							} else {
-								$("select[name=\""+child_list+"\"] option").show();
+								$child.find("option").show();
 							}
-				    	}
-				    	function showOptionsOnMultiselect(child_list, parent_list){
-
-				    	    var val = $("select[name=\""+parent_list+"\"]").val();
-				    		var parentVal = parent_list + ":" + val;
-				    		if(typeof val == "string"){
-				    		    if(val != "") {
-				    		        if($("#"+child_list).hasClass("multiselect")){
-								     	var allOptionsWithParent = $("select[id=\""+child_list+"\"] option")
-								        var optionsToShow = $("select[id=\""+child_list+"\"] option[parent=\""+parentVal+"\"]");
-								        $("#"+child_list).select2();
-								        for (option of allOptionsWithParent){
-								            option.disabled = true;
-								        }
-								        for (option of optionsToShow){
-								            option.disabled = false;
-								        }
-								        $("span.select2-selection.select2-selection--multiple").click(function() {
-								        	var select2_liToHide = $(".select2-results__option[aria-disabled=true]")
-								        	for (li of select2_liToHide){
-								        	    $(li).css("display", "none")
-								        	}
-										});
-					    			}
-		    		    		}
-				    		} else if(val > 0) {
-				    		    if($("#"+child_list).hasClass("multiselect")){
-								     	var allOptionsWithParent = $("select[id=\""+child_list+"\"] option")
-								        var optionsToShow = $("select[id=\""+child_list+"\"] option[parent=\""+parentVal+"\"]");
-								     	$("#"+child_list).select2();
-								        for (option of allOptionsWithParent){
-								            option.disabled = true;
-								        }
-								        for (option of optionsToShow){
-								            option.disabled = false;
-								        }
-								        $("span.select2-selection.select2-selection--multiple").click(function() {
-								            var select2_liToHide = $(".select2-results__option[aria-disabled=true]")
-								        	for (li of select2_liToHide){
-								        	    $(li).css("display", "none")
-								        	}
-										});
-					    			}
-				    		}
-				    	}
-						function setListDependencies() {
-					    	jQuery("select option[parent]").parent().each(function() {
-					    		var child_list = $(this).attr("id");
-								var parent = $(this).find("option[parent]:first").attr("parent");
-								var infos = parent.split(":");
-								var parent_list = infos[0];
-								//Hide daughters lists
-								if ($("#"+child_list).val() == 0 && $("#"+parent_list).val() == 0){
-								    var child = $("#"+child_list)
-								    //Hide children multiselects
-								    if($("#"+child_list).hasClass("multiselect")){
-								        $("span.select2-selection.select2-selection--multiple").hide()
-								    }
-								    $("#"+child_list).hide();
-
-								//Show mother lists
-								} else if ($("#"+parent_list).val() != 0){
-								    $("#"+parent_list).show();
-								    //show multiselects if its a parent one
-								    if($("#"+child_list).hasClass("multiselect")){
-								        $("span.select2-selection.select2-selection--multiple").show()
-								    }
-								}
-								//show the child list if the parent list value is selected
-								$("select[name=\""+parent_list+"\"]").click(function() {
-								    if ($(this).val() != 0){
-								        $("#"+child_list).show()
-								        //show children multiselects if the parent list value is selected
-								        if($("#"+child_list).hasClass("multiselect")){
-								        	$("span.select2-selection.select2-selection--multiple").show()
-								    	}
-									}
-								});
-								$("select[name=\""+parent_list+"\"]").change(function() {
-									showOptions(child_list, parent_list);
-									showOptionsOnMultiselect(child_list, parent_list)
-									$("#"+child_list).val(0).trigger("change");
-									//Hide child lists if the parent value is set to 0
-									if ($(this).val() == 0){
-								   		$("#"+child_list).hide();
-								   		//Hide children multiselects
-								   		if($("#"+child_list).hasClass("multiselect")){
-								        	$("span.select2-selection.select2-selection--multiple").hide()
-								    	}
-									}
-								});
-					    	});
 						}
 
+						/**
+						* Make multiselect options visible or invisible depending on what option is selected in the
+						* parent select.
+						*
+						* @param {string} child_list  Code of the child extrafield (starts with "options_")
+						* @param {string} parent_list Code of the parent extrafield (starts with "options_")
+						*/
+						function showOptionsOnMultiselect(child_list, parent_list) {
+							var val = $("select[name=\""+parent_list+"\"]").val();
+							var parentVal = parent_list + ":" + val;
+							let $child = $("select#" + child_list);
+							if (val !== "") {
+								if ($child.hasClass("multiselect")) {
+									let allOptionsWithParent = $child.find("option");
+									let optionsByParent = multiSelectOptionsByParent[child_list];
+									$child.empty().select2({data: optionsByParent[parentVal]});
+								}
+							}
+						}
+
+						/**
+						* Create event listeners on selects that depend on each other to hide them when they depend on
+						* a parent that has no option selected, or to change their option list when the parent’s
+						* selection changes
+						*/
+						function setListDependencies() {
+							// pour tous les <select> parents d’une option ayant un data-parent défini:
+							$("select option[data-parent]").parent().each(function() {
+								var child_list = $(this).attr("id");
+								let $child = $(this);
+								var parent_list = $(this).find("option[data-parent]:first").data("parent").split(":")[0];
+								let $parent = $("#" + parent_list);
+								let hasEmptyVal = function ($select) {
+									let val = $select.val();
+									return val === "0" || (Array.isArray(val) && val.length === 0);
+								};
+								// Hide child lists
+								if (hasEmptyVal($child) && hasEmptyVal($parent)) {
+									//Hide children multiselects
+									if ($child.hasClass("multiselect")) {
+										$child.next(".select2").hide()
+									}
+									$child.hide();
+
+								// Show parent lists
+								} else if ($parent.val() !== "0"){
+									$parent.show();
+									//show multiselects if its a parent one
+									if ($child.hasClass("multiselect")) {
+										$child.next(".select2").show()
+									}
+								}
+								// show the child list if the parent list value is selected
+								$parent.click(function() {
+									if ($(this).val() !== "0"){
+										$child.show()
+										//show children multiselects if the parent list value is selected
+										if ($child.hasClass("multiselect")) {
+											$child.next(".select2").show()
+										}
+									}
+								});
+								$parent.change(function() {
+									showOptions(child_list, parent_list);
+									showOptionsOnMultiselect(child_list, parent_list)
+									$child.val("0").trigger("change");
+									// Hide child lists if the parent value is set to 0
+									if ($(this).val() === "0"){
+										$child.hide();
+										// Hide children multiselects
+										if ($child.hasClass("multiselect")) {
+											$child.next(".select2").hide()
+										}
+									}
+								});
+							});
+						}
+
+						// create an object holding all multiselect options sorted by parent and by multiselect
+						let multiSelectOptionsByParent = {};
+						$("select.multiselect").each(function (n, select) {
+							if (!select.id) return;
+							let optionsByParent = {};
+							multiSelectOptionsByParent[select.id] = optionsByParent;
+							$(select).find("option").each(function (n, opt) {
+								let $opt = $(opt);
+								let parent = $opt.data("parent") || "";
+								if (optionsByParent[parent] === undefined) optionsByParent[parent] = [];
+								optionsByParent[parent].push({
+									id: $opt.val(),
+									text: $opt.text(),
+								});
+						    });
+						});
+
 						setListDependencies();
-				    });
+					});
 				</script>'."\n";
 				$out .= '<!-- /showOptionalsInput --> '."\n";
 			}
