@@ -59,11 +59,20 @@ $result = restrictedArea($user, 'tax', $id, 'chargesociales', 'charges');
 
 $object = new ChargeSociales($db);
 
+// Initialize technical object to manage hooks of page. Note that conf->hooks_modules contains array of hook context
+$hookmanager->initHooks(array('socialecard', 'globalcard'));
+
 /* *************************************************************************** */
 /*                                                                             */
 /* Actions                                                                     */
 /*                                                                             */
 /* *************************************************************************** */
+
+$parameters = array();
+$reshook = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
+if ($reshook < 0) {
+    setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
+}
 
 // Classify paid
 if ($action == 'confirm_paid' && $user->rights->tax->charges->creer && $confirm == 'yes')
